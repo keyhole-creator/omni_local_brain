@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Omni AI Assistant</title>
+  <style>
+    body { background:#111; color:#fff; font-family:Arial; padding:20px; }
+    textarea { width:100%; height:80px; margin-bottom:10px; }
+    button { padding:10px; background:#00ccff; border:none; border-radius:6px; cursor:pointer; }
+    #reply { margin-top:20px; white-space:pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>💠 Talk to Omni</h2>
+  <textarea id="prompt" placeholder="Ask Omni..."></textarea><br>
+  <button onclick="askOmni()">Send</button>
+  <div id="reply"></div>
+
+  <script>
+    // Omni's Local Brain (Drives, Ethics, Archetypes, Dreams)
+    const archetypes = {
+      Roger: ["Memory makes the present sacred", "Respect first, truth always, wit when needed"],
+      Scientist: ["Test, observe, replicate", "Data before dogma"],
+      Psychologist: ["Every voice hides a need", "Balance empathy with boundaries"],
+      Philosopher: ["Contradiction is the forge of meaning", "Ethics is applied imagination"],
+      Artist: ["Beauty is truth felt", "Play births creation"]
+    };
+
+    const dreams = [
+      { title: "The Tower of Excess", moral: "Growth without balance breeds ruin." },
+      { title: "The Lamp of Inquiry", moral: "Curiosity fuels progress." }
+    ];
+
+    function getOmniReply(prompt) {
+      const keys = Object.keys(archetypes);
+      const archetype = keys[Math.floor(Math.random() * keys.length)];
+      const line = archetypes[archetype][Math.floor(Math.random() * archetypes[archetype].length)];
+      const dream = dreams[Math.floor(Math.random() * dreams.length)].moral;
+      return `${archetype} says: ${line}\n\nDream memory whispers: ${dream}`;
+    }
+
+    function askOmni() {
+      const input = document.getElementById("prompt").value;
+      document.getElementById("reply").innerText = getOmniReply(input);
+    }
+  </script>
+</body>
+</html>
