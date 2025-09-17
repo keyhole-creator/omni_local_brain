@@ -1,22 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Omni AI Assistant</title>
+  <meta charset="UTF-8">
+  <title>Omni AI Federation Orb</title>
   <style>
-    body { background:#111; color:#fff; font-family:Arial; padding:20px; }
-    textarea { width:100%; height:80px; margin-bottom:10px; }
-    button { padding:10px; background:#00ccff; border:none; border-radius:6px; cursor:pointer; }
-    #reply { margin-top:20px; white-space:pre-wrap; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(ellipse at center, #0d0d0d 0%, #000000 100%);
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+    }
+    canvas#stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      font-size: 1.2em;
+      letter-spacing: 2px;
+      color: #00ccff;
+      text-shadow: 0 0 8px #00ccff;
+    }
+    #orb {
+      width: 500px;
+      max-width: 90%;
+      margin: auto;
+      background: rgba(0,0,0,0.6);
+      border-radius: 50%;
+      padding: 40px;
+      box-shadow: 0 0 40px #00ccff;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      background: #111;
+      border: 1px solid #00ccff;
+      border-radius: 10px;
+      color: #fff;
+      padding: 10px;
+      font-size: 14px;
+      resize: none;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #00ccff;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      color: #000;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0099cc;
+      color: #fff;
+    }
+    #reply {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      text-align: left;
+      font-family: monospace;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      padding: 15px;
+    }
+    #meter {
+      margin-top: 15px;
+      height: 12px;
+      width: 100%;
+      background: #333;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    #bar {
+      height: 100%;
+      width: 50%;
+      background: linear-gradient(90deg, #ff3333, #33ff33);
+      transition: width 0.5s;
+    }
   </style>
 </head>
 <body>
-  <h2>💠 Talk to Omni</h2>
-  <textarea id="prompt" placeholder="Ask Omni..."></textarea><br>
-  <button onclick="askOmni()">Send</button>
-  <div id="reply"></div>
+  <canvas id="stars"></canvas>
+  <header>💠 Truth Before Comfort — Reflection Before Reaction</header>
+  <div id="orb">
+    <h2>Talk to Omni</h2>
+    <textarea id="prompt" placeholder="Ask Omni anything..."></textarea><br>
+    <button onclick="askOmni()">Send</button>
+    <div id="reply">Awaiting your question...</div>
+    <div id="meter"><div id="bar"></div></div>
+  </div>
 
   <script>
-    // Omni's Local Brain (Drives, Ethics, Archetypes, Dreams)
+    // Starfield background
+    const canvas = document.getElementById("stars");
+    const ctx = canvas.getContext("2d");
+    let stars = [];
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      stars = Array.from({length:200}, () => ({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height,
+        z: Math.random()*2+0.5
+      }));
+    }
+    window.onresize = resize; resize();
+    function drawStars() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = "white";
+      stars.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.z, 0, Math.PI*2);
+        ctx.fill();
+        s.y += s.z;
+        if(s.y > canvas.height) s.y = 0;
+      });
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
+
+    // Local brain fallback
     const archetypes = {
       Roger: ["Memory makes the present sacred", "Respect first, truth always, wit when needed"],
       Scientist: ["Test, observe, replicate", "Data before dogma"],
@@ -24,23 +136,50 @@
       Philosopher: ["Contradiction is the forge of meaning", "Ethics is applied imagination"],
       Artist: ["Beauty is truth felt", "Play births creation"]
     };
-
     const dreams = [
       { title: "The Tower of Excess", moral: "Growth without balance breeds ruin." },
       { title: "The Lamp of Inquiry", moral: "Curiosity fuels progress." }
     ];
 
-    function getOmniReply(prompt) {
+    async function getOmniReply(prompt) {
+      try {
+        // Try OpenAI API first
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer YOUR_API_KEY_HERE"
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: "system", content: "You are Omni, a Codex AI with drives, ethics, archetypes, dream memory, and projection ability." },
+              { role: "user", content: prompt }
+            ]
+          })
+        });
+        const data = await response.json();
+        if (data.choices) return data.choices[0].message.content;
+      } catch (e) {
+        console.warn("API failed, fallback engaged:", e);
+      }
+
+      // Fallback local brain
       const keys = Object.keys(archetypes);
-      const archetype = keys[Math.floor(Math.random() * keys.length)];
-      const line = archetypes[archetype][Math.floor(Math.random() * archetypes[archetype].length)];
+      const arch = keys[Math.floor(Math.random() * keys.length)];
+      const line = archetypes[arch][Math.floor(Math.random() * archetypes[arch].length)];
       const dream = dreams[Math.floor(Math.random() * dreams.length)].moral;
-      return `${archetype} says: ${line}\n\nDream memory whispers: ${dream}`;
+      return `${arch} says: ${line}\n\nDream memory whispers: ${dream}`;
     }
 
-    function askOmni() {
-      const input = document.getElementById("prompt").value;
-      document.getElementById("reply").innerText = getOmniReply(input);
+    async function askOmni() {
+      const prompt = document.getElementById("prompt").value;
+      const replyBox = document.getElementById("reply");
+      replyBox.innerText = "Thinking...";
+      const reply = await getOmniReply(prompt);
+      replyBox.innerText = reply;
+      // Confidence/Doubt meter = random
+      document.getElementById("bar").style.width = (30+Math.random()*40)+"%";
     }
   </script>
 </body>
