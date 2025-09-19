@@ -183,6 +183,57 @@ function downloadMemory() {
   link.download = `${currentMemory.id || "omni_memory"}.json`;
   link.click();
 }
+<!-- 🧠 Memory Inspector Panel -->
+<div style="margin-top: 2rem; background: #111; padding: 1rem; border-radius: 12px; color: #eee;">
+  <h2>🧠 Omni Memory Inspector</h2>
+  <button onclick="loadMemory()">🔄 Load Memory</button>
+  <pre id="memory-output" style="white-space: pre-wrap; background: #222; padding: 1rem; margin-top: 1rem; border-radius: 8px;"></pre>
+</div>
+
+<script>
+async function loadMemory() {
+  const response = await fetch('./memory/memory_index.yaml');
+  const text = await response.text();
+  const parsed = jsyaml.load(text);
+
+  let output = '';
+
+  for (const category of Object.keys(parsed.memory_index)) {
+    output += `\n📂 ${category.toUpperCase()}\n`;
+    parsed.memory_index[category].forEach(entry => {
+      output += `  - 📝 ${entry.title} (${entry.id}) → ${entry.path}\n`;
+    });
+  }
+
+  document.getElementById('memory-output').textContent = output;
+}
+</script>
+
+<!-- Load JS-YAML to parse YAML in-browser -->
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+npm install express multer
+node server.js
+import express from 'express';
+import multer from 'multer';
+import fs from 'fs';
+
+const app = express();
+const upload = multer({ dest: 'uploads/' });
+
+app.post('/upload-yaml', upload.single('yamlFile'), (req, res) => {
+  const file = req.file;
+  if (!file) return res.status(400).send('No file uploaded.');
+
+  const newPath = `./memory/uploads/${file.originalname}`;
+  fs.renameSync(file.path, newPath);
+
+  // Optionally update memory_index.yaml here
+
+  res.send('YAML uploaded!');
+});
+
+app.listen(3000, () => console.log('Omni Brain live on port 3000'));
+
 </script>
 </body>
 </html>
