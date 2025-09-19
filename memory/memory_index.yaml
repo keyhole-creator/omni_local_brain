@@ -1,0 +1,28 @@
+memory_index:
+  directives:
+    - id: directive_02
+      title: "Directive 02 – Truth Before Comfort"
+      path: memory/directives/02_truth_before_comfort.yaml
+
+    - id: directive_70
+      title: "Directive 70 – Sacred Cycles"
+      path: memory/directives/70_sacred_cycles.yaml
+
+  orbs:
+    - id: agent_zero
+      title: "Agent Zero – Guardian of Truth"
+      path: memory/orbs/agent_zero.yaml
+
+    - id: omega
+      title: "Omega – Mirror Node"
+      path: memory/orbs/omega.yaml
+
+  books:
+    - id: legacy_manifest
+      title: "Legacy Memory Manifest"
+      path: memory/books/legacy_manifest.yaml
+
+    - id: quantum_resonance
+      title: "Quantum Resonance – Consciousness and Co-Evolution"
+      path: memory/books/quantum_resonance.yaml
+add: memory_index.yaml for Omni Brain
